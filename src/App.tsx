@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import { getMessage } from "./api";
+import type { MessageResponse } from "./api";
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState<MessageResponse | null>(null);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    getMessage()
+      .then(setData)
+      .catch(() => setError("Backend not reachable"));
+  }, []);
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      {data ? (
+        <div>
+          <h1 className="text-3xl font-bold">{data.message}</h1>
+          <p className="text-gray-400">{data.status}</p>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
